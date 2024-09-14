@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { AnagramGameData } from "./AnagramGameContent";
 import { motion } from "framer-motion"
 import { Button } from "./ui/button";
+import toast from "./toast";
+import paper from "./images/paper.jpg"
 
 interface gameDataType {
     id: number,
@@ -35,6 +37,7 @@ const AnagramsUi = () => {
     }
     const [currGameData, setCurrGameData] = useState<gameDataType>(defaultGameData);
     const [shallowCurrGameData, setShallowCurrGameData] = useState<gameDataType>(defaultGameData);
+    const [scoreArr, setScoreArr] = useState<number[]>([])
     const [anagramNumber, setAnagramNumber] = useState<number>(1);
     const [currGameAnswer, setCurrGameAnswer] = useState<string[]>([]);
     const [savedAnswers, setSavedAnswers] = useState<string[]>([])
@@ -61,14 +64,20 @@ const AnagramsUi = () => {
     const removeUserAnswer = () => {
         setCurrGameAnswer(prevAnswer => prevAnswer.slice(0, -1));
     }
+    const addToScore = (score: number) => {
+        setScoreArr(prevScore => [...prevScore, score])
+
+    }
     const saveUserAnswer = () => {
         const userAnswer = currGameAnswer.join('');
         if (savedAnswers.includes(userAnswer)) {
-            alert("Already chosen")
+            toast("already chosen", "error")
             ResetOptions()
         }
         else if (currGameData.validWords.includes(userAnswer)) {
             setSavedAnswers(prevAnswers => [...prevAnswers, userAnswer]);
+            toast(`${userAnswer}(+${userAnswer.length * 100})`, "success")
+            addToScore(userAnswer.length * 100)
             ResetOptions()
         } else {
             alert('Invalid answer');
@@ -84,8 +93,22 @@ const AnagramsUi = () => {
     }
     return (
         <section className="py-10 xl:px-4 sm:px-0">
-            <div className="min-h-[400px] max-h-[400px]  pb-4 animation-container">
+            <div className="min-h-[400px] max-h-[400px] relative  pb-4 animation-container">
+                <div className="timer rounded-[16px] px-3 bx-shadow-light absolute right-5 top-2 text-[0.7rem]">
+                    <p className="mt-[2px] font-[600]">00:59</p>
+
+                </div>
                 <div>
+                    <div className="score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800" style={{
+                        backgroundImage: `url(${paper.src})`
+                    }}>
+                        <div className="flex-col gap-1 text-black ">
+                            <h3 className="font-[600] text-[1.05rem]">WORDS: {savedAnswers.length} </h3>
+                            <h1 className="font-[700] text-[1.3rem]">SCORE: {(scoreArr.reduce((acc, val) => acc + val, 0)).toString().padStart(4, "00")}</h1>
+
+                        </div>
+
+                    </div>
 
                     <div className="flex gap-4 flex-col items-center justify-center">
                         <div className="flex gap-3">
