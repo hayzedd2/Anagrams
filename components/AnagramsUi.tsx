@@ -168,6 +168,7 @@ const AnagramsUi = () => {
         setSavedAnswers([])
         setTimeLeft(60)
         setCurrGameAnswer(Array(6).fill(""));
+        setScoreArr([])
     }
     const flashVariants = {
         none: { backgroundColor: '#ffffff' },
@@ -203,7 +204,7 @@ const AnagramsUi = () => {
                     <div className="flex flex-col  gap-2 h-[12rem] overflow-scroll indicator py-2  mt-[-20px]">
                         {savedAnswers.map((saved, index) => {
                             return (
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center" key={index}>
                                     <div className="woodish-bg bx-shadow rounded-[5px] px-2 py-1 ">
                                         <h2 className="font-[700] text-[0.85rem] text-white">{saved}</h2>
 
@@ -245,7 +246,7 @@ const AnagramsUi = () => {
 
                                 <h1 className="font-[700] flex text-[1.3rem]">
                                     SCORE:
-                                    <MotionNumber format={{minimumIntegerDigits :4}} className="mt-[1px]" value={scoreArr.length<=0 ? "0000":scoreArr
+                                    <MotionNumber format={{minimumIntegerDigits :4}}  className="mt-[1px]" value={scoreArr.length<=0 ? "0000":scoreArr
                                         .reduce((acc, val) => acc + val, 0)
                                         } />
                                     {/* <AnimatedNumbers animateToNumber={scoreArr.length<=0 ? 0o0:scoreArr
