@@ -102,3 +102,26 @@
     transform: rotate(1turn);
   }
 }
+
+.woodish-bg {
+  background: linear-gradient(
+      90deg,
+      rgba(139, 69, 19, 0.8) 0%,
+      rgba(160, 82, 45, 0.8) 50%,
+      rgba(139, 69, 19, 0.8) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 5px,
+      rgba(0, 0, 0, 0.1) 5px,
+      rgba(0, 0, 0, 0.1) 10px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(139, 69, 19, 0.8),
+      rgba(139, 69, 19, 0.8) 10px,
+      rgba(160, 82, 45, 0.8) 10px,
+      rgba(160, 82, 45, 0.8) 20px
+    );
+}
