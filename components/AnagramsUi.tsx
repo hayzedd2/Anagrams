@@ -3,13 +3,11 @@ import { useState, useEffect } from "react";
 import { AnagramGameData } from "./AnagramGameContent";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import toast from "./toast";
+import { useSound } from "./useSoundEffect";
 import paper from "./images/paper.jpg";
 import { verifyWord } from "./verifyWord";
 import MotionNumber from "motion-number";
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
-
-import AnimatedNumbers from "react-animated-numbers"
 
 
 
@@ -48,12 +46,14 @@ const AnagramsUi = () => {
         useState<gameDataType>(defaultGameData);
     const [scoreArr, setScoreArr] = useState<number[]>([]);
     const [timeLeft, setTimeLeft] = useState<number>(60);
-    const { load } = useGlobalAudioPlayer();
     const [anagramNumber, setAnagramNumber] = useState<number>(1);
     const [currGameAnswer, setCurrGameAnswer] = useState(Array(6).fill(""));
     const [savedAnswers, setSavedAnswers] = useState<string[]>([]);
-    const [flash, setFlash] = useState<'none' | 'success' | 'error'>('none')
+    const [flash, setFlash] = useState<'none' | 'success' | 'error' | 'chosen'>('none')
+    const [toastOptions, setToastOptions] = useState<{ message: string, type: string }>({ message: "", type: "" })
     const [finishedPlaying, setFinishedPlaying] = useState(false)
+    const playButtonClick = useSound('/sounds/btnclick.wav');
+    const playSuccess = useSound('/sounds/success.wav')
     const getRandomAnagramNumber = (): number => {
         return Math.floor(Math.random() * 42) + 1;
     };
@@ -94,8 +94,7 @@ const AnagramsUi = () => {
     const pushUserAnswer = (letter: string, index: number) => {
 
         if (letter) {
-            playSound("/sounds/btnclick.wav")
-            load("/sounds/btnclick.wav")
+            playButtonClick()
             const emptyIndex = currGameAnswer.findIndex((l) => l === "");
             if (emptyIndex !== -1) {
                 const newAnswer = [...currGameAnswer];
@@ -109,9 +108,7 @@ const AnagramsUi = () => {
     };
 
     const removeLetterFromAnswer = (letter: string, index: number) => {
-
         if (letter) {
-            // playSound("/sounds/btnclick.wav")
             const newAnswer = [...currGameAnswer];
             newAnswer[index] = "";
             setCurrGameAnswer(newAnswer);
@@ -129,25 +126,29 @@ const AnagramsUi = () => {
     const saveUserAnswer = () => {
         const userAnswer = currGameAnswer.join("");
         if (savedAnswers.includes(userAnswer)) {
-            toast("Already chosen", "error");
-            alert("already chosen");
+            setToastOptions({ message: "Already chosen", type: "chosen" })
+            setTimeout(() => setToastOptions({ message: "", type: "exit" }), 1400)
+            setFlash('chosen')
+            setTimeout(() => setFlash('none'), 500)
             ResetOptions();
         } else {
             verifyWord(userAnswer)
                 .then((isValid) => {
                     if (isValid) {
-                        playSound('/sounds/success.wav')
+                        playSuccess()
                         setSavedAnswers((prevAnswers) => [...prevAnswers, userAnswer]);
-                        toast(`${userAnswer}(+${userAnswer.length * 100})`, "success");
+                        setToastOptions({ message: `${userAnswer}(+${userAnswer.length * 100})`, type: "success" })
+                        setTimeout(() => setToastOptions({ message: "", type: "exit" }), 1400)
                         addToScore(userAnswer.length * 100);
                         setFlash('success')
                         setTimeout(() => setFlash('none'), 500)
                         ResetOptions();
 
                     } else {
-                        alert("Invalid answer");
                         ResetOptions();
                         setFlash('error')
+                        setToastOptions({ message: `${userAnswer}(NOT IN VOCABULARY)`, type: "error" })
+                        setTimeout(() => setToastOptions({ message: "", type: "exit" }), 1400)
                         setTimeout(() => setFlash('none'), 500)
                         // LOGIC TO RESET TO DEFAULT
                     }
@@ -174,10 +175,17 @@ const AnagramsUi = () => {
         none: { backgroundColor: '#ffffff' },
         success: { backgroundColor: ['#ffffff', 'rgba(74, 222, 128, 0.6)', '#ffffff'] },
         error: { backgroundColor: ['#ffffff', 'rgba(239, 68, 68, 0.6)', '#ffffff'] },
+        chosen: { backgroundColor: ['#ffffff', 'rgba(220, 220, 220, 0.8)', '#ffffff'] },
+    }
+    const toastVariants = {
+        success: { y: -40, opacity: [0, 1, 0], color: "#4ade80 " },
+        chosen: { y: -40, opacity: [0, 1, 0], color: "#111110" },
+        error: { y: -40, opacity: [0, 1, 0], color: "#f87171" },
+        exit: { y: 0, opacity: 0 }
     }
     return (
         <section className="py-10 xl:px-4 sm:px-0">
-            <div className="min-h-[400px] max-h-[400px]  relative  pb-4 animation-container">
+            <div className="min-h-[400px]  max-h-[400px] relative  pb-4 animation-container">
                 {finishedPlaying ? <div className="flex flex-col  justify-center">
                     <div
                         className="score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800"
@@ -218,7 +226,7 @@ const AnagramsUi = () => {
                         <Button
                             onClick={() => ResetGame()}
 
-                            className="font-[600] bx-shadow bg-gray-600 mt-3 hover:bg-gray-600 rounded-[6px] h-10 w-[10rem] text-white"
+                            className="font-[600] bx-shadow  bg-[#111110] mt-3 hover:bg-[#111110] rounded-[6px] h-10 w-[10rem] text-white"
 
                         >
                             Play Again
@@ -226,7 +234,12 @@ const AnagramsUi = () => {
                     </div>
 
                 </div> : <>
+                    <motion.p variants={toastVariants} animate={toastOptions.type} transition={{
+                        duration: 1.4,
+                        ease: "easeInOut"
+                    }} className="absolute bottom-[12.5rem] z-10  font-[700] text-[0.75rem] ">{toastOptions.message}</motion.p>
                     <div className="timer rounded-[16px] px-3 bx-shadow-light absolute right-5 top-2 text-[0.7rem]">
+
 
                         <p className="mt-[2px] font-[600]">{formatTime(timeLeft)}</p>
                     </div>
@@ -246,16 +259,10 @@ const AnagramsUi = () => {
 
                                 <h1 className="font-[700] flex text-[1.3rem]">
                                     SCORE:
-                                    <MotionNumber format={{minimumIntegerDigits :4}}  className="mt-[1px]" value={scoreArr.length<=0 ? "0000":scoreArr
+                                    <MotionNumber format={{ minimumIntegerDigits: 4 }} className="mt-[1px]" value={scoreArr.length <= 0 ? "0000" : scoreArr
                                         .reduce((acc, val) => acc + val, 0)
-                                        } />
-                                    {/* <AnimatedNumbers animateToNumber={scoreArr.length<=0 ? 0o0:scoreArr
-                                        .reduce((acc, val) => acc + val, 0)
-                                        }  /> */}
-                                    {/* {scoreArr
-                                        .reduce((acc, val) => acc + val, 0)
-                                        .toString()
-                                        .padStart(4, "000")} */}
+                                    } />
+
                                 </h1>
                             </div>
                         </div>
@@ -269,7 +276,7 @@ const AnagramsUi = () => {
                                             variants={flashVariants}
                                             transition={{ duration: 0.5 }}
                                             whileTap={{
-                                                scale: 0.8,
+                                                scale: 0.7,
                                             }}
                                             onClick={() => removeLetterFromAnswer(letter, index)}
                                             key={index}
@@ -288,7 +295,7 @@ const AnagramsUi = () => {
                                     return (
                                         <motion.div
                                             whileTap={{
-                                                scale: 0.8,
+                                                scale: 0.7,
                                             }}
                                             onClick={() => pushUserAnswer(letter, index)}
                                             key={index}
@@ -304,7 +311,7 @@ const AnagramsUi = () => {
                             </div>
                             <Button
                                 onClick={saveUserAnswer}
-                                className="font-[700] bx-shadow bg-gray-600 mt-3 hover:bg-gray-600 rounded-[6px] h-10 w-[10rem] text-white"
+                                className="font-[700] bx-shadow bg-[#111110] mt-3 hover:bg-[#111110] rounded-[6px] h-10 w-[10rem] text-white"
                                 disabled={currGameAnswer.filter(Boolean).length <= 2}
                             >
                                 ENTER
