@@ -86,7 +86,7 @@
 }
 
 .animation-container {
-  @apply flex relative gap-2 px-3 bg-white bx-shadow-light rounded-xl xl:min-w-[37.5rem] xl:max-w-[400px] overflow-hidden items-center justify-center border-2 border-[hsla(0,0%,100%,.03)];
+  @apply flex relative gap-2 px-3 bg-white bx-shadow-light rounded-xl xl:min-w-[37.5rem]  xl:max-w-[400px] overflow-hidden items-center justify-center border-2 border-[hsla(0,0%,100%,.03)];
 }
 
 .loading-spinners_rotateFast__a3gT9 {
@@ -124,4 +124,12 @@
       rgba(160, 82, 45, 0.8) 10px,
       rgba(160, 82, 45, 0.8) 20px
     );
+}
+
+
+.indicator::-webkit-scrollbar {
+  display: none;
+}
+.indicator {
+  scrollbar-width: none;
 }
