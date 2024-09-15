@@ -63,6 +63,7 @@ const AnagramsUi = () => {
         setAnagramNumber(newAnagramNumber);
     };
     useEffect(() => {
+        console.log(currGameAnswer)
         updateGameData();
     }, []);
 
@@ -90,7 +91,7 @@ const AnagramsUi = () => {
     const pushUserAnswer = (letter: string, index: number) => {
 
         if (letter) {
-            playSound("/sounds/btnclick.wav")
+            // playSound("/sounds/btnclick.wav")
             const emptyIndex = currGameAnswer.findIndex((l) => l === "");
             if (emptyIndex !== -1) {
                 const newAnswer = [...currGameAnswer];
@@ -106,7 +107,7 @@ const AnagramsUi = () => {
     const removeLetterFromAnswer = (letter: string, index: number) => {
 
         if (letter) {
-            playSound("/sounds/btnclick.wav")
+            // playSound("/sounds/btnclick.wav")
             const newAnswer = [...currGameAnswer];
             newAnswer[index] = "";
             setCurrGameAnswer(newAnswer);
@@ -242,7 +243,7 @@ const AnagramsUi = () => {
                         <Button
                             onClick={saveUserAnswer}
                             className="font-[700] bx-shadow bg-gray-600 mt-3 hover:bg-gray-600 rounded-[6px] h-10 w-[10rem] text-white"
-                            disabled={currGameAnswer.length <= 2}
+                            disabled={currGameAnswer.filter(Boolean).length <= 2}
                         >
                             ENTER
                         </Button>
