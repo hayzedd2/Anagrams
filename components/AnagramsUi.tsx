@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import { AnagramGameData } from "./AnagramGameContent";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { useSound } from "./useSoundEffect";
+// import { useSound } from "./useSoundEffect";
 import paper from "./images/paper.jpg";
 import { verifyWord } from "./verifyWord";
 import MotionNumber from "motion-number";
-import { Gloria_Hallelujah } from "next/font/google";
+import { Gloria_Hallelujah } from "next/font/google"
+import useSound from 'use-sound'
 
 interface gameDataType {
     id: number;
@@ -44,6 +45,11 @@ const AnagramsUi = () => {
     const [shallowCurrGameData, setShallowCurrGameData] =
         useState<gameDataType>(defaultGameData);
     const [scoreArr, setScoreArr] = useState<number[]>([]);
+    const [playSuccess] = useSound('/sounds/alert2.m4a')
+    const [playChosen] = useSound('/sounds/whoosh-2.wav')
+    const [playError] = useSound('/sounds/collapse.m4a')
+    const [playBtnClick] = useSound('/sounds/button5.m4a')
+    // const [playSuccess] = useSound('/sounds/alert2.m4a')
     const [timeLeft, setTimeLeft] = useState<number>(60);
     const [anagramNumber, setAnagramNumber] = useState<number>(1);
     const [currGameAnswer, setCurrGameAnswer] = useState(Array(6).fill(""));
@@ -52,9 +58,7 @@ const AnagramsUi = () => {
     const [toastOptions, setToastOptions] = useState<{ message: string, type: string }>({ message: "", type: "" })
     const [finishedPlaying, setFinishedPlaying] = useState(false)
     const playButtonClick = useSound('/sounds/button5.m4a');
-    const playSuccess = useSound('/sounds/alert2.m4a')
-    const playChosen = useSound('/sounds/whoosh-2.wav')
-    const playError = useSound('/sounds/collapse.m4a')
+    
     const getRandomAnagramNumber = (): number => {
         return Math.floor(Math.random() * 42) + 1;
     };
@@ -88,7 +92,7 @@ const AnagramsUi = () => {
     };
     const pushUserAnswer = (letter: string, index: number) => {
         if (letter) {
-            // playButtonClick()
+            playBtnClick()
             const emptyIndex = currGameAnswer.findIndex((l) => l === "");
             if (emptyIndex !== -1) {
                 const newAnswer = [...currGameAnswer];
