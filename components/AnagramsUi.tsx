@@ -7,12 +7,14 @@ import { useSound } from "./useSoundEffect";
 import paper from "./images/paper.jpg";
 import { verifyWord } from "./verifyWord";
 import MotionNumber from "motion-number";
+import { Gloria_Hallelujah } from "next/font/google";
 
 interface gameDataType {
     id: number;
     letters: string[];
     validWords: string[];
 }
+const gloria = Gloria_Hallelujah({ subsets: ["latin"], weight: ["400"] })
 
 const AnagramsUi = () => {
     const defaultGameData = {
@@ -49,10 +51,10 @@ const AnagramsUi = () => {
     const [flash, setFlash] = useState<'none' | 'success' | 'error' | 'chosen'>('none')
     const [toastOptions, setToastOptions] = useState<{ message: string, type: string }>({ message: "", type: "" })
     const [finishedPlaying, setFinishedPlaying] = useState(false)
-    const playButtonClick = useSound('/sounds/buttons/button5.m4a');
-    const playSuccess = useSound('/sounds/alerts/alert2.m4a')
+    const playButtonClick = useSound('/sounds/button5.m4a');
+    const playSuccess = useSound('/sounds/alert2.m4a')
     const playChosen = useSound('/sounds/whoosh-2.wav')
-    const playError = useSound('/sounds/buttons/collapse.m4a')
+    const playError = useSound('/sounds/collapse.m4a')
     const getRandomAnagramNumber = (): number => {
         return Math.floor(Math.random() * 42) + 1;
     };
@@ -181,7 +183,7 @@ const AnagramsUi = () => {
             <div className="min-h-[400px]  max-h-[400px] relative  pb-4 animation-container">
                 {finishedPlaying ? <div className="flex flex-col  justify-center">
                     <div
-                        className="score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800"
+                        className={` ${gloria.className} score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800`}
 
                         style={{
                             backgroundImage: `url(${paper.src})`,
@@ -238,7 +240,7 @@ const AnagramsUi = () => {
                     </div>
                     <div>
                         <div
-                            className="score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800"
+                            className={` ${gloria.className} score-board flex items-center justify-center bg-contain bg-center w-[20rem] mb-10 h-[6rem] bg-gray-800`}
 
                             style={{
                                 backgroundImage: `url(${paper.src})`,
@@ -311,9 +313,9 @@ const AnagramsUi = () => {
                             </Button>
                         </div>
                     </div></>}
-                               
+
             </div>
-    
+
         </section>
     );
 };
