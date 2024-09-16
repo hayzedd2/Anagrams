@@ -88,7 +88,7 @@ const AnagramsUi = () => {
     };
     const pushUserAnswer = (letter: string, index: number) => {
         if (letter) {
-            playButtonClick()
+            // playButtonClick()
             const emptyIndex = currGameAnswer.findIndex((l) => l === "");
             if (emptyIndex !== -1) {
                 const newAnswer = [...currGameAnswer];
