@@ -7,9 +7,6 @@ import { useSound } from "./useSoundEffect";
 import paper from "./images/paper.jpg";
 import { verifyWord } from "./verifyWord";
 import MotionNumber from "motion-number";
-import { useGlobalAudioPlayer } from 'react-use-audio-player';
-
-
 
 interface gameDataType {
     id: number;
@@ -52,8 +49,10 @@ const AnagramsUi = () => {
     const [flash, setFlash] = useState<'none' | 'success' | 'error' | 'chosen'>('none')
     const [toastOptions, setToastOptions] = useState<{ message: string, type: string }>({ message: "", type: "" })
     const [finishedPlaying, setFinishedPlaying] = useState(false)
-    const playButtonClick = useSound('/sounds/btnclick.wav');
-    const playSuccess = useSound('/sounds/success.wav')
+    const playButtonClick = useSound('/sounds/buttons/button5.m4a');
+    const playSuccess = useSound('/sounds/alerts/alert2.m4a')
+    const playChosen = useSound('/sounds/whoosh-2.wav')
+    const playError = useSound('/sounds/buttons/collapse.m4a')
     const getRandomAnagramNumber = (): number => {
         return Math.floor(Math.random() * 42) + 1;
     };
@@ -85,14 +84,7 @@ const AnagramsUi = () => {
         const remainingSeconds = seconds % 60;
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     };
-    const playSound = (soundPath: string) => {
-        const audio = new Audio(soundPath);
-        audio.play().catch(error => {
-            console.error('Error playing sound:', error);
-        });
-    };
     const pushUserAnswer = (letter: string, index: number) => {
-
         if (letter) {
             playButtonClick()
             const emptyIndex = currGameAnswer.findIndex((l) => l === "");
@@ -130,6 +122,7 @@ const AnagramsUi = () => {
             setTimeout(() => setToastOptions({ message: "", type: "exit" }), 1400)
             setFlash('chosen')
             setTimeout(() => setFlash('none'), 500)
+            playChosen()
             ResetOptions();
         } else {
             verifyWord(userAnswer)
@@ -147,10 +140,10 @@ const AnagramsUi = () => {
                     } else {
                         ResetOptions();
                         setFlash('error')
+                        playError()
                         setToastOptions({ message: `${userAnswer}(NOT IN VOCABULARY)`, type: "error" })
                         setTimeout(() => setToastOptions({ message: "", type: "exit" }), 1400)
                         setTimeout(() => setFlash('none'), 500)
-                        // LOGIC TO RESET TO DEFAULT
                     }
                 })
                 .catch((error) => {
@@ -257,7 +250,7 @@ const AnagramsUi = () => {
                                     {savedAnswers.length}
                                 </h3>
 
-                                <h1 className="font-[700] flex text-[1.3rem]">
+                                <h1 className="font-[700] flex text-[1.2rem]">
                                     SCORE:
                                     <MotionNumber format={{ minimumIntegerDigits: 4 }} className="mt-[1px]" value={scoreArr.length <= 0 ? "0000" : scoreArr
                                         .reduce((acc, val) => acc + val, 0)
@@ -318,9 +311,9 @@ const AnagramsUi = () => {
                             </Button>
                         </div>
                     </div></>}
-
-
+                               
             </div>
+    
         </section>
     );
 };

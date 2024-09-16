@@ -28,8 +28,7 @@ export const useSound = (soundPath: string) => {
       if (!isLoadedRef.current) {
         audio.load();
       }
-      
-      // iOS workaround
+
       if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         audio.muted = true;
         audio.play().then(() => {
